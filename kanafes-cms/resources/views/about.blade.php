@@ -35,10 +35,19 @@
                 </div>
             </div>
 
-            <!-- Venue Gallery -->
+            <!-- Venue Gallery — Dynamic from DB -->
             <div class="venue-gallery">
-                <img src="{{ asset('assets/images/map-park.jpg') }}" alt="Thong Nhat Park Gate">
-                <img src="{{ asset('assets/images/map.png') }}" alt="Map to Thong Nhat Park">
+                @if($venueImage1)
+                    <img src="{{ asset('storage/about/' . $venueImage1) }}" alt="Thong Nhat Park Gate">
+                @else
+                    <img src="{{ asset('assets/images/map-park.jpg') }}" alt="Thong Nhat Park Gate">
+                @endif
+
+                @if($venueImage2)
+                    <img src="{{ asset('storage/about/' . $venueImage2) }}" alt="Map to Thong Nhat Park">
+                @else
+                    <img src="{{ asset('assets/images/map.png') }}" alt="Map to Thong Nhat Park">
+                @endif
             </div>
         </div>
     </section>

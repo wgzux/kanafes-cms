@@ -43,7 +43,23 @@
                           {{ request()->routeIs('admin.media*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
                     <span>🎬</span> Video & Mạng xã hội
                 </a>
-                <p class="px-3 pt-4 pb-1 text-xs font-semibold text-red-300 uppercase tracking-wider">Quản lý</p>
+                <p class="px-3 pt-4 pb-1 text-xs font-semibold text-red-300 uppercase tracking-wider">Quản lý trang</p>
+                <a href="{{ route('admin.about-page.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                          {{ request()->routeIs('admin.about-page*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
+                    <span>📋</span> Tổng quan sự kiện
+                </a>
+                <a href="{{ route('admin.event-page.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                          {{ request()->routeIs('admin.event-page*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
+                    <span>🎌</span> Giới thiệu sự kiện
+                </a>
+                <a href="{{ route('admin.map-page.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                          {{ request()->routeIs('admin.map-page*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
+                    <span>🗺️</span> Bản đồ & Gian hàng
+                </a>
+                <p class="px-3 pt-4 pb-1 text-xs font-semibold text-red-300 uppercase tracking-wider">Quản lý khác</p>
                 <a href="{{ route('admin.sponsors.index') }}"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
                           {{ request()->routeIs('admin.sponsors*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">

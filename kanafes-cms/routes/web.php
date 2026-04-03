@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SponsorController as AdminSponsorController;
 use App\Http\Controllers\Admin\PageContentController;
+use App\Http\Controllers\Admin\AboutPageController;
+use App\Http\Controllers\Admin\EventPageController;
+use App\Http\Controllers\Admin\MapPageController;
 
 // =============================================
 // PUBLIC ROUTES
@@ -84,4 +87,25 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminMid
     Route::get('/page-contents',               [PageContentController::class, 'index'])->name('page-contents.index');
     Route::get('/page-contents/{page}/edit',   [PageContentController::class, 'edit'])->name('page-contents.edit');
     Route::put('/page-contents/{page}',        [PageContentController::class, 'update'])->name('page-contents.update');
+
+    // About Page Management
+    Route::get('/about-page',  [AboutPageController::class, 'index'])->name('about-page.index');
+    Route::put('/about-page',  [AboutPageController::class, 'update'])->name('about-page.update');
+
+    // Event Page Management
+    Route::get('/event-page',                           [EventPageController::class, 'index'])->name('event-page.index');
+    Route::put('/event-page/content',                   [EventPageController::class, 'updateContent'])->name('event-page.update-content');
+    Route::post('/event-page/performers',               [EventPageController::class, 'storePerformer'])->name('event-page.store-performer');
+    Route::put('/event-page/performers/{performer}',    [EventPageController::class, 'updatePerformer'])->name('event-page.update-performer');
+    Route::delete('/event-page/performers/{performer}', [EventPageController::class, 'destroyPerformer'])->name('event-page.destroy-performer');
+
+    // Map Page Management
+    Route::get('/map-page',                    [MapPageController::class, 'index'])->name('map-page.index');
+    Route::put('/map-page/map',                [MapPageController::class, 'updateMap'])->name('map-page.update-map');
+    Route::post('/map-page/groups',            [MapPageController::class, 'storeGroup'])->name('map-page.store-group');
+    Route::put('/map-page/groups',             [MapPageController::class, 'updateGroup'])->name('map-page.update-group');
+    Route::delete('/map-page/groups',          [MapPageController::class, 'destroyGroup'])->name('map-page.destroy-group');
+    Route::post('/map-page/booths',            [MapPageController::class, 'storeBooth'])->name('map-page.store-booth');
+    Route::put('/map-page/booths/{booth}',     [MapPageController::class, 'updateBooth'])->name('map-page.update-booth');
+    Route::delete('/map-page/booths/{booth}',  [MapPageController::class, 'destroyBooth'])->name('map-page.destroy-booth');
 });
