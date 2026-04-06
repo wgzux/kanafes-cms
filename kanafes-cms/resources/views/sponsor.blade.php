@@ -9,26 +9,97 @@
             <div class="sponsor__title-underline"></div>
         </div>
 
-        {{-- Hiển thị từ DB nếu có, fallback về danh sách gốc --}}
+        {{-- ====================================================
+             SPONSORS TỪ DB (nếu có)
+             ====================================================
+             Layout theo tier dùng đúng CSS class gốc:
+               diamond → sponsor__row          (full width, 1 sponsor/dòng)
+               gold    → sponsor__row--two-item (2 sponsor/dòng, dùng sponsor__column)
+               silver  → sponsor__row--three-item (3 sponsor/dòng)
+               bronze  → sponsor__row--three-item (nhiều hàng)
+             ====================================================--}}
         @if($sponsors->flatten()->isNotEmpty())
-            {{-- Sponsors từ Admin CMS --}}
-            @foreach(['diamond','gold','silver','bronze'] as $tier)
-                @if(isset($sponsors[$tier]) && $sponsors[$tier]->isNotEmpty())
-                    @foreach($sponsors[$tier] as $sponsor)
-                        @if($sponsor->website_url)
-                            <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__row">
-                                <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}"/>
-                                <span>{{ $sponsor->name }}</span>
-                            </a>
-                        @else
-                            <div class="sponsor__row">
-                                <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}"/>
-                                <span>{{ $sponsor->name }}</span>
-                            </div>
-                        @endif
-                    @endforeach
-                @endif
-            @endforeach
+
+            {{-- DIAMOND: 1 mỗi hàng, logo cỡ lớn nhất --}}
+            @if(isset($sponsors['diamond']) && $sponsors['diamond']->isNotEmpty())
+                @foreach($sponsors['diamond'] as $sponsor)
+                    @if($sponsor->website_url)
+                        <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__row">
+                            <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                            <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                        </a>
+                    @else
+                        <div class="sponsor__row">
+                            <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                            <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                        </div>
+                    @endif
+                @endforeach
+            @endif
+
+            {{-- GOLD: 2 mỗi hàng --}}
+            @if(isset($sponsors['gold']) && $sponsors['gold']->isNotEmpty())
+                @foreach($sponsors['gold']->chunk(2) as $chunk)
+                    <div class="sponsor__row sponsor__row--two-item">
+                        @foreach($chunk as $sponsor)
+                            @if($sponsor->website_url)
+                                <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </a>
+                            @else
+                                <div class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @endforeach
+            @endif
+
+            {{-- SILVER: 3 mỗi hàng --}}
+            @if(isset($sponsors['silver']) && $sponsors['silver']->isNotEmpty())
+                @foreach($sponsors['silver']->chunk(3) as $chunk)
+                    <div class="sponsor__row sponsor__row--three-item">
+                        @foreach($chunk as $sponsor)
+                            @if($sponsor->website_url)
+                                <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </a>
+                            @else
+                                <div class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @endforeach
+            @endif
+
+            {{-- BRONZE: 3 mỗi hàng (cùng layout silver nhưng nhỏ hơn theo sort) --}}
+            @if(isset($sponsors['bronze']) && $sponsors['bronze']->isNotEmpty())
+                @foreach($sponsors['bronze']->chunk(3) as $chunk)
+                    <div class="sponsor__row sponsor__row--three-item">
+                        @foreach($chunk as $sponsor)
+                            @if($sponsor->website_url)
+                                <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </a>
+                            @else
+                                <div class="sponsor__column">
+                                    <img src="{{ $sponsor->logo_url }}" alt="{{ $sponsor->name }}" />
+                                    <span>{!! nl2br(e($sponsor->name)) !!}</span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @endforeach
+            @endif
+
         @else
             {{-- FALLBACK: Danh sách nhà tài trợ gốc từ HTML tĩnh --}}
             <a href="https://mikazuki.com.vn/" target="_blank" class="sponsor__row">
@@ -105,8 +176,33 @@
                     <span>ビゼックス合同事務所<br/>Văn phòng chung Bizex</span>
                 </a>
             </div>
+        @endif
 
-            <br><br><br>
+        {{-- ====================================================
+             PHẦN 協力 — CÔNG TY ĐỐI TÁC (từ DB hoặc fallback)
+             ==================================================== --}}
+        @if($partners->isNotEmpty())
+            <br><br>
+            <div class="sponsor__title">
+                <h2>協力</h2>
+                <div class="sponsor__title-underline"></div>
+            </div>
+            @foreach($partners as $partner)
+                @if($partner->website_url)
+                    <a href="{{ $partner->website_url }}" target="_blank" class="sponsor__row">
+                        <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" />
+                        <span>{!! nl2br(e($partner->name)) !!}</span>
+                    </a>
+                @else
+                    <div class="sponsor__row">
+                        <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" />
+                        <span>{!! nl2br(e($partner->name)) !!}</span>
+                    </div>
+                @endif
+            @endforeach
+        @elseif($sponsors->flatten()->isEmpty())
+            {{-- Fallback partner khi dùng fallback sponsor --}}
+            <br><br>
             <div class="sponsor__title">
                 <h2>協力</h2>
                 <div class="sponsor__title-underline"></div>
@@ -116,6 +212,7 @@
                 <span>株式会社タカラ<br>TAKARA</span>
             </a>
         @endif
+
     </section>
     <!-- SPONSOR SECTION END -->
 

@@ -9,8 +9,8 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tên nhà tài trợ <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}" required
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent">
+                    <textarea name="name" id="name" required rows="3"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent">{{ old('name') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Cấp bậc <span class="text-red-500">*</span></label>

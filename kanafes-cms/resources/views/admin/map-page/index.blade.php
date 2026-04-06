@@ -71,7 +71,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     {{-- Nút sửa nhóm --}}
-                    <button type="button" onclick="document.getElementById('edit-group-{{ Str::slug($group->group_name) }}').classList.toggle('hidden')"
+                    <button type="button" onclick="document.getElementById('edit-group-{{ $loop->index }}').classList.toggle('hidden')"
                             class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg hover:bg-blue-200 transition">✏️ Sửa nhóm</button>
                     {{-- Nút xóa nhóm --}}
                     <form action="{{ route('admin.map-page.destroy-group') }}" method="POST"
@@ -84,7 +84,7 @@
             </div>
 
             {{-- Form sửa nhóm (ẩn) --}}
-            <div id="edit-group-{{ Str::slug($group->group_name) }}" class="hidden px-6 py-3 bg-yellow-50 border-b">
+            <div id="edit-group-{{ $loop->index }}" class="hidden px-6 py-3 bg-yellow-50 border-b">
                 <form action="{{ route('admin.map-page.update-group') }}" method="POST" class="flex items-end gap-4">
                     @csrf @method('PUT')
                     <input type="hidden" name="old_group_name" value="{{ $group->group_name }}">
@@ -147,9 +147,9 @@
 
                 {{-- Thêm gian hàng mới vào nhóm --}}
                 <div class="mt-3 pt-3 border-t border-gray-200">
-                    <button type="button" onclick="document.getElementById('add-booth-{{ Str::slug($group->group_name) }}').classList.toggle('hidden')"
+                    <button type="button" onclick="document.getElementById('add-booth-{{ $loop->index }}').classList.toggle('hidden')"
                             class="text-green-600 hover:text-green-800 text-sm font-medium">＋ Thêm gian hàng vào nhóm này</button>
-                    <div id="add-booth-{{ Str::slug($group->group_name) }}" class="hidden mt-2">
+                    <div id="add-booth-{{ $loop->index }}" class="hidden mt-2">
                         <form action="{{ route('admin.map-page.store-booth') }}" method="POST" class="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
                             @csrf
                             <input type="hidden" name="group_name" value="{{ $group->group_name }}">

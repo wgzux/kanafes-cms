@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PageContentController;
 use App\Http\Controllers\Admin\AboutPageController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\MapPageController;
+use App\Http\Controllers\Admin\PartnerCompanyController;
 
 // =============================================
 // PUBLIC ROUTES
@@ -82,6 +83,9 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminMid
 
     // Sponsors
     Route::resource('sponsors', AdminSponsorController::class)->except(['show']);
+
+    // Partner Companies (協力)
+    Route::resource('partners', PartnerCompanyController::class)->except(['show']);
 
     // Page Contents
     Route::get('/page-contents',               [PageContentController::class, 'index'])->name('page-contents.index');

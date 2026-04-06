@@ -65,6 +65,11 @@
                           {{ request()->routeIs('admin.sponsors*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
                     <span>🤝</span> Nhà tài trợ
                 </a>
+                <a href="{{ route('admin.partners.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                          {{ request()->routeIs('admin.partners*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
+                    <span>🏢</span> Công ty đối tác
+                </a>
                 <a href="{{ route('admin.page-contents.index') }}"
                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
                           {{ request()->routeIs('admin.page-contents*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
