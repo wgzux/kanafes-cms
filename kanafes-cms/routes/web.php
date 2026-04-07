@@ -78,8 +78,7 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminMid
     Route::post('/gallery/order', [GalleryController::class, 'updateOrder'])->name('gallery.order');
 
     // Media (YouTube / Facebook)
-    Route::get('/media',  [MediaController::class, 'index'])->name('media.index');
-    Route::post('/media', [MediaController::class, 'update'])->name('media.update');
+    Route::resource('media', MediaController::class)->except(['show']);
 
     // Sponsors
     Route::resource('sponsors', AdminSponsorController::class)->except(['show']);

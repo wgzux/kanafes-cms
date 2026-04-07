@@ -3,36 +3,72 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SiteSetting;
+use App\Models\MediaItem;
 use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
     public function index()
     {
-        $youtube  = SiteSetting::get('youtube_url');
-        $facebook = SiteSetting::get('facebook_post_url');
-        $ytTitle  = SiteSetting::get('youtube_title',  '神奈川県公式YOUTUBEチャンネル');
-        $fbTitle  = SiteSetting::get('facebook_title', '公式FACEBOOK');
-
-        return view('admin.media.index', compact('youtube', 'facebook', 'ytTitle', 'fbTitle'));
+        $medias = MediaItem::orderBy('sort_order')->get();
+        return view('admin.media.index', compact('medias'));
     }
 
-    public function update(Request $request)
+    public function create()
+    {
+        return view('admin.media.create');
+    }
+
+    public function store(Request $request)
     {
         $request->validate([
-            'youtube_url'      => 'nullable|url',
-            'facebook_post_url'=> 'nullable|url',
-            'youtube_title'    => 'nullable|string|max:255',
-            'facebook_title'   => 'nullable|string|max:255',
+            'type'       => 'required|in:youtube,facebook',
+            'title'      => 'required|string|max:255',
+            'url'        => 'required|string', // URL/iframe source
+            'sort_order' => 'nullable|integer',
         ]);
 
-        SiteSetting::set('youtube_url',       $request->youtube_url);
-        SiteSetting::set('facebook_post_url', $request->facebook_post_url);
-        SiteSetting::set('youtube_title',     $request->youtube_title);
-        SiteSetting::set('facebook_title',    $request->facebook_title);
+        MediaItem::create([
+            'type'       => $request->type,
+            'title'      => $request->title,
+            'url'        => $request->url,
+            'sort_order' => $request->sort_order ?? 0,
+            'is_active'  => $request->boolean('is_active', true),
+        ]);
 
-        return redirect()->route('admin.media.index')
-            ->with('success', 'Đường dẫn truyền thông đã được cập nhật!');
+        return redirect()->route('admin.media.index')->with('success', 'Đã thêm phương tiện thành công!');
     }
+
+    public function edit(MediaItem $medium)
+    {
+        return view('admin.media.edit', compact('medium'));
+    }
+
+    public function update(Request $request, MediaItem $medium)
+    {
+        $request->validate([
+            'type'       => 'required|in:youtube,facebook',
+            'title'      => 'required|string|max:255',
+            'url'        => 'required|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $medium->update([
+            'type'       => $request->type,
+            'title'      => $request->title,
+            'url'        => $request->url,
+            'sort_order' => $request->sort_order ?? 0,
+            'is_active'  => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->route('admin.media.index')->with('success', 'Cập nhật thành công!');
+    }
+
+    public function destroy(MediaItem $medium)
+    {
+        $medium->delete();
+        return redirect()->route('admin.media.index')->with('success', 'Đã xóa phương tiện.');
+    }
+
+    // Tạm giữ hàm cũ nếu routes/web.php còn dùng phương thức update kiểu cài đặt chung (không nên giữ nếu đã đổi resource)
 }

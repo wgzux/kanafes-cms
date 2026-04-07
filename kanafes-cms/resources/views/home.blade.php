@@ -38,26 +38,49 @@
 
     <!-- SOCIAL MEDIA SECTION -->
     <section class="container social">
+        <style>
+            /* Restore exact original sizes while allowing line wrap and centering */
+            .media {
+                display: flex !important;
+                flex-wrap: wrap;
+                justify-content: center; /* ⬅️ Center single items on the bottom row */
+                gap: 20px;
+                width: 100%;
+                height: auto !important; /* Allow growing vertically for multiple rows */
+            }
+            .media__container {
+                flex: 0 0 calc(50% - 10px) !important; /* Exactly 50% accounting for 20px gap */
+                max-width: calc(50% - 10px) !important;
+                height: 300px !important; /* ⬅️ Enforce correct original desktop frame height */
+            }
+            @media (max-width: 1024px) {
+                .media__container {
+                    flex: 0 0 100% !important;
+                    max-width: 100% !important;
+                    height: auto !important;
+                }
+            }
+        </style>
         <section class="media">
-            <div class="media__container">
-                <h3 class="media__youtube-title">{{ $ytTitle }}</h3>
-                @if($youtube)
-                    <iframe class="media__youtube-frame" src="{{ $youtube }}"
-                        title="YouTube video player" loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                @endif
-            </div>
-            <div class="media__container">
-                <h3 class="media__facebook-title">{{ $fbTitle }}</h3>
-                @if($facebook)
-                    <iframe class="media__facebook-frame" src="{{ $facebook }}"
-                        style="border:none;overflow:hidden" allowfullscreen="true"
-                        loading="lazy"
-                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                        title="Kanagawa Festival Official Facebook Post"></iframe>
-                @endif
-            </div>
+            @foreach($medias as $media)
+                <div class="media__container">
+                    <h3 class="{{ $media->type === 'youtube' ? 'media__youtube-title' : 'media__facebook-title' }}">{{ $media->title }}</h3>
+                    @if($media->url)
+                        @if($media->type === 'youtube')
+                            <iframe class="media__youtube-frame" src="{{ $media->url }}"
+                                title="YouTube video player" loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        @else
+                            <iframe class="media__facebook-frame" src="{{ $media->url }}"
+                                style="border:none;overflow:hidden" allowfullscreen="true"
+                                loading="lazy"
+                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                title="Kanagawa Festival Official Facebook Post"></iframe>
+                        @endif
+                    @endif
+                </div>
+            @endforeach
         </section>
     </section>
 

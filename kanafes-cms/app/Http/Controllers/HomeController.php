@@ -15,17 +15,13 @@ class HomeController extends Controller
         $bannerUrl  = $banner ? asset('storage/banners/' . $banner) : asset('assets/images/web-kanagwa.jpg');
 
         $content    = PageContent::getPage('home');
-        $youtube    = SiteSetting::get('youtube_url');
-        $facebook   = SiteSetting::get('facebook_post_url');
-        $ytTitle    = SiteSetting::get('youtube_title',   '神奈川県公式YOUTUBEチャンネル');
-        $fbTitle    = SiteSetting::get('facebook_title',  '公式FACEBOOK');
+        $medias     = \App\Models\MediaItem::active()->get();
 
         $gallery    = GalleryImage::active()->get();
         $sponsors   = Sponsor::active()->get()->groupBy('tier');
 
         return view('home', compact(
-            'bannerUrl', 'content', 'youtube', 'facebook',
-            'ytTitle', 'fbTitle', 'gallery', 'sponsors'
+            'bannerUrl', 'content', 'medias', 'gallery', 'sponsors'
         ));
     }
 }

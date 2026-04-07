@@ -2,46 +2,70 @@
 @section('title', 'Quản lý Video & Mạng xã hội')
 
 @section('content')
-<div class="max-w-2xl">
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <form action="{{ route('admin.media.update') }}" method="POST">
-            @csrf
-            <div class="space-y-5">
-                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">🎬 Tiêu đề YouTube</label>
-                    <input type="text" name="youtube_title" value="{{ old('youtube_title', $ytTitle) }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent">
-                </div>
-                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">🔗 Link YouTube (embed)</label>
-                    <input type="url" name="youtube_url" value="{{ old('youtube_url', $youtube) }}"
-                           placeholder="https://www.youtube.com/embed/VIDEO_ID"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent">
-                    <p class="text-xs text-gray-400 mt-1">⚠️ Phải ở dạng: https://www.youtube.com/embed/ID_VIDEO</p>
-                    @if($youtube)
-                        <div class="mt-3">
-                            <p class="text-xs text-gray-600 mb-1">Xem trước:</p>
-                            <iframe src="{{ $youtube }}" class="w-full h-40 rounded-lg" allowfullscreen loading="lazy"></iframe>
-                        </div>
-                    @endif
-                </div>
+<div class="flex items-center justify-between mb-6">
+    <p class="text-sm text-gray-500">{{ $medias->count() }} mục truyền thông</p>
+    <a href="{{ route('admin.media.create') }}"
+       class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition">
+        + Thêm mục mới
+    </a>
+</div>
 
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">📘 Tiêu đề Facebook</label>
-                    <input type="text" name="facebook_title" value="{{ old('facebook_title', $fbTitle) }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                </div>
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">🔗 Link Facebook Post (embed)</label>
-                    <textarea name="facebook_post_url" rows="3"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent">{{ old('facebook_post_url', $facebook) }}</textarea>
-                    <p class="text-xs text-gray-400 mt-1">⚠️ Dùng link từ Facebook Plugin → Embed Post</p>
-                </div>
-            </div>
-            <button type="submit" class="mt-6 w-full bg-red-600 text-white py-2.5 rounded-lg font-medium hover:bg-red-700 transition">
-                💾 Lưu cập nhật
-            </button>
-        </form>
-    </div>
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    @if($medias->isNotEmpty())
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                <tr>
+                    <th class="px-4 py-3 text-left w-24">Loại</th>
+                    <th class="px-4 py-3 text-left">Tiêu đề & URL</th>
+                    <th class="px-4 py-3 text-center w-20">Thứ tự</th>
+                    <th class="px-4 py-3 text-center w-24">Trạng thái</th>
+                    <th class="px-4 py-3 text-right w-36">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @foreach($medias as $media)
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3">
+                        @if($media->type === 'youtube')
+                            <span class="inline-block px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">🎬 YouTube</span>
+                        @else
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">📘 Facebook</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="font-medium text-gray-800">{{ $media->title }}</div>
+                        <a href="{{ $media->type === 'facebook' ? '#' : $media->url }}"
+                           target="_blank" class="text-xs text-blue-500 hover:underline truncate max-w-sm block mt-1">
+                            {{ Str::limit($media->url, 80) }}
+                        </a>
+                    </td>
+                    <td class="px-4 py-3 text-center text-gray-500">{{ $media->sort_order }}</td>
+                    <td class="px-4 py-3 text-center">
+                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium {{ $media->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $media->is_active ? 'Hiển thị' : 'Ẩn' }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{{ route('admin.media.edit', $media) }}"
+                               class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition">✏️ Sửa</a>
+                            <form action="{{ route('admin.media.destroy', $media) }}" method="POST"
+                                  onsubmit="return confirm('Bạn có chắc muốn xóa mục này?')">
+                                @csrf @method('DELETE')
+                                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition">🗑️ Xóa</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <div class="p-16 text-center text-gray-400">
+            <span class="text-5xl">ℹ️</span>
+            <p class="mt-3 text-lg font-medium">Chưa có mục truyền thông nào</p>
+            <a href="{{ route('admin.media.create') }}" class="mt-4 inline-block text-red-600 hover:underline text-sm">Thêm ngay →</a>
+        </div>
+    @endif
 </div>
 @endsection
