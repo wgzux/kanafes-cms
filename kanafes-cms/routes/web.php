@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AboutPageController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\MapPageController;
 use App\Http\Controllers\Admin\PartnerCompanyController;
+use App\Http\Controllers\Admin\ExportStaticController;
 
 // =============================================
 // PUBLIC ROUTES
@@ -68,6 +69,9 @@ Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\AdminMid
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Export Static Site
+    Route::get('/export-static', [ExportStaticController::class, 'export'])->name('export-static');
 
     // Banner
     Route::get('/banner',  [BannerController::class, 'index'])->name('banner.index');

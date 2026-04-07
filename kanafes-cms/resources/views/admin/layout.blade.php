@@ -75,12 +75,40 @@
                           {{ request()->routeIs('admin.page-contents*') ? 'bg-white text-red-700' : 'hover:bg-red-600 text-red-100' }}">
                     <span>📝</span> Nội dung trang
                 </a>
-                <div class="pt-4 border-t border-red-600 mt-4">
+                <div class="pt-4 border-t border-red-600 mt-4 space-y-1">
+                    {{-- Export Static Website Button --}}
+                    <a href="{{ route('admin.export-static') }}"
+                       id="btn-export-static"
+                       onclick="startExportLoading(event)"
+                       class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition bg-yellow-500 text-gray-900 hover:bg-yellow-400">
+                        <span id="export-icon">📦</span>
+                        <span id="export-label">Xuất Website (.zip)</span>
+                    </a>
                     <a href="{{ route('home') }}" target="_blank"
                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-200 hover:bg-red-600 transition">
                         <span>🌐</span> Xem trang chủ
                     </a>
                 </div>
+                <script>
+                    function startExportLoading(e) {
+                        var btn   = document.getElementById('btn-export-static');
+                        var icon  = document.getElementById('export-icon');
+                        var label = document.getElementById('export-label');
+                        // Prevent double-click
+                        if (btn.dataset.loading === '1') { e.preventDefault(); return; }
+                        btn.dataset.loading = '1';
+                        btn.classList.add('opacity-70', 'cursor-wait');
+                        icon.textContent  = '⏳';
+                        label.textContent = 'Đang xuất… vui lòng chờ';
+                        // Re-enable after 90 seconds (safety reset)
+                        setTimeout(function () {
+                            btn.dataset.loading = '0';
+                            btn.classList.remove('opacity-70', 'cursor-wait');
+                            icon.textContent  = '📦';
+                            label.textContent = 'Xuất Website (.zip)';
+                        }, 90000);
+                    }
+                </script>
             </nav>
             <!-- User -->
             <div class="p-4 border-t border-red-600">
