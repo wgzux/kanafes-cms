@@ -2,6 +2,26 @@
 @section('title', 'KANAGAWA FESTIVAL IN HANOI 2025')
 
 @section('content')
+    <style>
+        /* Fix Gold taking 100% width when alone & Bronze sizing correctly */
+        @media (min-width: 725px) {
+            .sponsor__row--gold {
+                justify-content: center;
+            }
+            .sponsor__row--gold > .sponsor__column {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+            .sponsor__row--bronze {
+                justify-content: center;
+            }
+            .sponsor__row--bronze > .sponsor__column,
+            .sponsor__row--bronze > * {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+    </style>
     <!-- SPONSOR SECTION START -->
     <section class="container sponsor__section">
         <div class="sponsor__title">
@@ -40,7 +60,7 @@
             {{-- GOLD: 2 mỗi hàng --}}
             @if(isset($sponsors['gold']) && $sponsors['gold']->isNotEmpty())
                 @foreach($sponsors['gold']->chunk(2) as $chunk)
-                    <div class="sponsor__row sponsor__row--two-item">
+                    <div class="sponsor__row sponsor__row--two-item sponsor__row--gold">
                         @foreach($chunk as $sponsor)
                             @if($sponsor->website_url)
                                 <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
@@ -61,7 +81,7 @@
             {{-- SILVER: 3 mỗi hàng --}}
             @if(isset($sponsors['silver']) && $sponsors['silver']->isNotEmpty())
                 @foreach($sponsors['silver']->chunk(3) as $chunk)
-                    <div class="sponsor__row sponsor__row--three-item">
+                    <div class="sponsor__row sponsor__row--three-item sponsor__row--silver">
                         @foreach($chunk as $sponsor)
                             @if($sponsor->website_url)
                                 <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
@@ -79,10 +99,10 @@
                 @endforeach
             @endif
 
-            {{-- BRONZE: 3 mỗi hàng (cùng layout silver nhưng nhỏ hơn theo sort) --}}
+            {{-- BRONZE: 4 mỗi hàng --}}
             @if(isset($sponsors['bronze']) && $sponsors['bronze']->isNotEmpty())
-                @foreach($sponsors['bronze']->chunk(3) as $chunk)
-                    <div class="sponsor__row sponsor__row--three-item">
+                @foreach($sponsors['bronze']->chunk(4) as $chunk)
+                    <div class="sponsor__row sponsor__row--three-item sponsor__row--bronze">
                         @foreach($chunk as $sponsor)
                             @if($sponsor->website_url)
                                 <a href="{{ $sponsor->website_url }}" target="_blank" class="sponsor__column">
