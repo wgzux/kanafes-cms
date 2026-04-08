@@ -165,57 +165,67 @@ class ExportStaticController extends Controller
     /**
      * Rewrite all absolute URLs inside the HTML so that the page works
      * when opened directly from the filesystem (file:///…).
-     *
-     * Strategy:
-     *  - All asset() / url() calls produce http://localhost:8000/assets/...
-     *    → replace with ./assets/...
-     *  - Inter-page links: /about → about.html, etc.
-     *  - Laravel CSRF / action forms: stripped (static page can't POST).
      */
     private function rewritePathsForOffline(string $html, string $currentFile): string
     {
-        // ── A. Fix absolute asset URLs from asset()/url() ─────────────
-        // e.g. http://localhost:8000/assets/css/style.css → ./assets/css/style.css
-        $html = str_replace($this->appUrl . '/', './', $html);
-
-        // ── B. Fix root-relative asset paths (no domain prefix) ───────
-        // e.g. /assets/css/style.css → ./assets/css/style.css
-        $html = preg_replace(
-            '#(href|src|action)=(["\'])/assets/#',
-            '$1=$2./assets/',
-            $html
-        );
-
-        // Fix storage root-relative paths
-        $html = preg_replace(
-            '#(href|src|action)=(["\'])/storage/#',
-            '$1=$2./storage/',
-            $html
-        );
-
-        // ── C. Rewrite internal navigation links ──────────────────────
-        $routeMap = [
-            ['pattern' => '#href=(["\'])' . preg_quote($this->appUrl, '#') . '(["\'])#', 'replace' => 'href=$1index.html$2'],
-            ['pattern' => '#href=(["\'])/#',        'replace' => 'href=$1index.html'],
-            ['pattern' => '#href=(["\'])/about(["\'/])#',   'replace' => 'href=$1about.html$2'],
-            ['pattern' => '#href=(["\'])/event(["\'/])#',   'replace' => 'href=$1event.html$2'],
-            ['pattern' => '#href=(["\'])/map(["\'/])#',     'replace' => 'href=$1map.html$2'],
-            ['pattern' => '#href=(["\'])/sponsor(["\'/])#', 'replace' => 'href=$1sponsor.html$2'],
+        // 1. Prepare candidate domains (to handle both 127.0.0.1 and localhost if needed)
+        // We prioritize the configured APP_URL
+        $domains = [
+            $this->appUrl,
+            'http://localhost:8000',
+            'http://127.0.0.1:8000',
         ];
+        $domains = array_unique($domains);
 
-        foreach ($routeMap as $rule) {
-            $html = preg_replace($rule['pattern'], $rule['replace'], $html);
+        // 2. Fix Assets & Storage (Absolute to Relative)
+        // We do this first because asset links often contain the domain
+        foreach ($domains as $domain) {
+            $html = str_replace($domain . '/assets/', './assets/', $html);
+            $html = str_replace($domain . '/storage/', './storage/', $html);
+            $html = str_replace($domain . '/favicon.ico', './favicon.ico', $html);
         }
 
-        // ── D. Fix remaining heuristic href="/" after above ───────────
-        $html = preg_replace('#href=(["\'])\./$#m', 'href=$1index.html', $html);
+        // 3. Fix Assets & Storage (Root-relative to Relative)
+        // e.g. /assets/... -> ./assets/...
+        $html = preg_replace('#(href|src|action)=(["\'])/assets/#', '$1=$2./assets/', $html);
+        $html = preg_replace('#(href|src|action)=(["\'])/storage/#', '$1=$2./storage/', $html);
+        $html = str_replace('href="/favicon.ico"', 'href="./favicon.ico"', $html);
 
-        // ── E. Remove CSRF tokens & forms that won't work offline ─────
+        // 4. Handle Page Routes (Both Absolute and Root-relative)
+        // We define the mapping from current routes to .html files
+        $routes = [];
+        foreach ($this->pageMap as $htmlFile => $route) {
+            $routeName = ($route === 'home') ? '' : $route;
+            
+            foreach ($domains as $domain) {
+                // Absolute: http://domain.com/about or http://domain.com/about/
+                $routes[] = ['pattern' => '#href=(["\'])' . preg_quote($domain . '/' . $routeName, '#') . '/?(["\'])#', 'replacement' => 'href=$1' . $htmlFile . '$2'];
+            }
+            
+            // Root-relative: href="/about" or href="/about/"
+            if ($routeName !== '') {
+                $routes[] = ['pattern' => '#href=(["\'])/' . preg_quote($routeName, '#') . '/?(["\'])#', 'replacement' => 'href=$1' . $htmlFile . '$2'];
+            }
+        }
+
+        // Add special case for root "/" -> index.html
+        foreach ($domains as $domain) {
+            $routes[] = ['pattern' => '#href=(["\'])' . preg_quote($domain, '#') . '/?(["\'])#', 'replacement' => 'href=$1index.html$2'];
+        }
+        $routes[] = ['pattern' => '#href=(["\'])/(["\'])#', 'replacement' => 'href=$1index.html$2'];
+
+        // Sort routes by pattern length descending to match longer patterns first (e.g. /about before /)
+        usort($routes, function($a, $b) {
+            return strlen($b['pattern']) <=> strlen($a['pattern']);
+        });
+
+        foreach ($routes as $route) {
+            $html = preg_replace($route['pattern'], $route['replacement'], $html);
+        }
+
+        // 5. Cleanup Laravel-specific tags that break offline
         $html = preg_replace('/<input[^>]*name=["\']_token["\'][^>]*>/i', '', $html);
         $html = preg_replace('/<meta[^>]*name=["\']csrf-token["\'][^>]*>/i', '', $html);
-
-        // ── F. Fix favicon root-relative if present ───────────────────
-        $html = str_replace('href="/favicon.ico"', 'href="./favicon.ico"', $html);
 
         return $html;
     }
